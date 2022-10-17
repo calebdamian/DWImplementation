@@ -1,30 +1,24 @@
-# pruebas de funcionamiento
+# Testing file
+
 import traceback
 from extract.extract_channels import ext_channels
-from util import db_connection
-import configparser
+from extract.extract_countries import ext_countries
+from extract.extract_customers import ext_customers
+from extract.extract_products import ext_products
+from extract.extract_promotions import ext_promotions
+from extract.extract_sales import ext_sales
+from extract.extract_times import ext_times
 
-"""config = configparser.ConfigParser()
-config.read("./.properties")
-config.get("DatabaseSection", "DB_TYPE")
-# instancia de clase
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
-"""
+
 try:
-    """conn = stg_conn.start()
-    if conn == -1:
-        raise Exception(f"The database type {stg_conn.type} is not valid")
-    elif conn == -2:
-        raise Exception("Error trying to connect to cdnastaging")"""
     ext_channels()
+    ext_countries()
+    ext_customers()
+    ext_products()
+    ext_promotions()
+    ext_sales()
+    ext_times()
+
 except:
     traceback.print_exc()
 finally:

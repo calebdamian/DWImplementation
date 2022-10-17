@@ -1,4 +1,3 @@
-from ipaddress import collapse_addresses
 import traceback
 from util import db_connection
 import pandas as pd
@@ -8,7 +7,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read(".properties")
 config.get("DatabaseSection", "DB_TYPE")
-# instancia de clase
+# Creating a new db conn object
 sectionName = "DatabaseSection"
 stg_conn = db_connection.Db_Connection(
     config.get(sectionName, "DB_TYPE"),
@@ -21,44 +20,48 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 
-def ext_channels():
+def ext_countries():
     try:
-        # instanciar y conecter base de datos
+        # Connecting db
         conn = stg_conn.start()
         if conn == -1:
             raise Exception(f"The database type {stg_conn.type} is not valid")
         elif conn == -2:
             raise Exception("Error trying to connect to cdnastaging")
 
-        # columnas de la tabla channels
-        # no es case sensitive
-        colummns_dict = {
-            "channel_id": [],
-            "channel_desc": [],
-            "channel_class": [],
-            "channel_class_id": [],
+        # Dictionary of values
+
+        country_col_dict = {
+            "country_id": [],
+            "country_name": [],
+            "country_region": [],
+            "country_region_id": [],
         }
 
-        # crear dataframe leyendo el csv
-        channel_csv = pd.read_csv(config.get(cvsSectionName, "CHANNELS_PATH"))
-        # print(channel_csv)
-        # persistir en tablas de staging
-        # procesando el contenido del csv
-        if not channel_csv.empty:
-            for id, desc, ch_class, ch_class_id in zip(
-                channel_csv["CHANNEL_ID"],
-                channel_csv["CHANNEL_DESC"],
-                channel_csv["CHANNEL_CLASS"],
-                channel_csv["CHANNEL_CLASS_ID"],
+        # Read CSV
+        country_csv = pd.read_csv(config.get(cvsSectionName, "COUNTRIES_PATH"))
+
+        # Processing CSV content
+        if not country_csv.empty:
+            for id, name, reg, reg_id in zip(
+                country_csv["COUNTRY_ID"],
+                country_csv["COUNTRY_NAME"],
+                country_csv["COUNTRY_REGION"],
+                country_csv["COUNTRY_REGION_ID"],
             ):
-                colummns_dict["channel_id"].append(id)
-                colummns_dict["channel_desc"].append(desc)
-                colummns_dict["channel_class"].append(ch_class)
-                colummns_dict["channel_class_id"].append(ch_class_id)
-        if colummns_dict["channel_id"]:
-            conn.connect().execute("TRUNCATE TABLE channels")
-            df_channels = pd.DataFrame(colummns_dict)
-            df_channels.to_sql("channels", conn, if_exists="append", index=False)
+
+                country_col_dict["country_id"].append(id)
+                country_col_dict["country_name"].append(name)
+                country_col_dict["country_region"].append(reg)
+                country_col_dict["country_region_id"].append(reg_id)
+        if country_col_dict["country_id"]:
+            conn.connect().execute("TRUNCATE TABLE countries")
+            # Creating Dataframe
+            # Persisting into db
+            df_countries = pd.DataFrame(country_col_dict)
+            df_countries.to_sql("countries", conn, if_exists="append", index=False)
+            # Dispose db connection
+            conn.dispose()
     except:
         traceback.print_exc()
     finally:

@@ -5,6 +5,7 @@ Desarrollado por: **Caleb Damian Naranjo Albuja**
 ## Requisitos
 
 * Instalar MySQL Workbench 8.0 y MySQL Server usando MySQL Installer 8.0.31
+* Replique el modelo de datos presente en la carpeta evidencesSem3/Diagrama_ModeloDatos_CDNA_Staging
 * Descargue e instale python 3.10.8 (https://www.python.org/downloads/), recuerde marcar la casilla "Add Python to PATH". 
 * Descargue e instale GIT (https://git-scm.com/downloads)
 * Descargue el código zip del repo de github o clone el repositorio de git con el terminal de Visual Studio Code

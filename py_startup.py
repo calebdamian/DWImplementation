@@ -10,11 +10,11 @@ from extract.extract_promotions import ext_promotions
 from extract.extract_sales import ext_sales
 from extract.extract_times import ext_times
 from transform.transformations import *
-from util.get_db_conn import get_db_conn
+from util.get_db_connection import get_db_connection
 
 try:
-    print(get_db_conn("sor").start())
-    # ext_channels()
+    print(get_db_connection("sor").start())
+    # ext_channels()3
 
 except:
 

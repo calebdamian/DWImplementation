@@ -3,7 +3,7 @@ from configparser import ConfigParser
 from db_connection import Db_Connection
 
 
-def get_db_conn(db_purpose="stg"):
+def get_db_connection(db_purpose="stg"):
     config = ConfigParser()
     config.read(".properties")
     # Creating a new db conn object

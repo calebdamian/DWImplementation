@@ -59,11 +59,11 @@ def ext_promotions():
                 promos_col_dict["promo_end_date"].append(pr_end)
 
         if promos_col_dict["promo_id"]:
-            conn.connect().execute("TRUNCATE TABLE promotions")
+            conn.connect().execute("TRUNCATE TABLE promotions_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(promos_col_dict)
-            df_countries.to_sql("promotions", conn, if_exists="append", index=False)
+            df_countries.to_sql("promotions_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

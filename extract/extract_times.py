@@ -86,11 +86,11 @@ def ext_times():
                 times_col_dict["calendar_year"].append(t_cal_yr)
 
         if times_col_dict["time_id"]:
-            conn.connect().execute("TRUNCATE TABLE times")
+            conn.connect().execute("TRUNCATE TABLE times_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(times_col_dict)
-            df_countries.to_sql("times", conn, if_exists="append", index=False)
+            df_countries.to_sql("times_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

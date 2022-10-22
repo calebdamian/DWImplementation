@@ -89,11 +89,11 @@ def ext_products():
                 products_col_dict["prod_min_price"].append(p_min)
 
         if products_col_dict["prod_id"]:
-            conn.connect().execute("TRUNCATE TABLE products")
+            conn.connect().execute("TRUNCATE TABLE products_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(products_col_dict)
-            df_countries.to_sql("products", conn, if_exists="append", index=False)
+            df_countries.to_sql("products_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

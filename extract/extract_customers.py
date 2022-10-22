@@ -105,11 +105,11 @@ def ext_customers():
                 customers_col_dict["cust_email"].append(email)
 
         if customers_col_dict["cust_id"]:
-            conn.connect().execute("TRUNCATE TABLE customers")
+            conn.connect().execute("TRUNCATE TABLE customers_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(customers_col_dict)
-            df_countries.to_sql("customers", conn, if_exists="append", index=False)
+            df_countries.to_sql("customers_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

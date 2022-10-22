@@ -65,11 +65,11 @@ def ext_sales():
                 sales_col_dict["amount_sold"].append(sl_am)
 
         if sales_col_dict["prod_id"]:
-            conn.connect().execute("TRUNCATE TABLE sales")
+            conn.connect().execute("TRUNCATE TABLE sales_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(sales_col_dict)
-            df_countries.to_sql("sales", conn, if_exists="append", index=False)
+            df_countries.to_sql("sales_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

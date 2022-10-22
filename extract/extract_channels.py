@@ -54,11 +54,11 @@ def ext_channels():
                 colummns_dict["channel_class"].append(ch_class)
                 colummns_dict["channel_class_id"].append(ch_class_id)
         if colummns_dict["channel_id"]:
-            conn.connect().execute("TRUNCATE TABLE channels")
+            conn.connect().execute("TRUNCATE TABLE channels_ext")
             # Creating Dataframe
             # Persisting into db
             df_channels = pd.DataFrame(colummns_dict)
-            df_channels.to_sql("channels", conn, if_exists="append", index=False)
+            df_channels.to_sql("channels_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

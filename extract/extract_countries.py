@@ -55,11 +55,11 @@ def ext_countries():
                 country_col_dict["country_region"].append(reg)
                 country_col_dict["country_region_id"].append(reg_id)
         if country_col_dict["country_id"]:
-            conn.connect().execute("TRUNCATE TABLE countries")
+            conn.connect().execute("TRUNCATE TABLE countries_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(country_col_dict)
-            df_countries.to_sql("countries", conn, if_exists="append", index=False)
+            df_countries.to_sql("countries_ext", conn, if_exists="append", index=False)
             # Dispose db connection
             conn.dispose()
     except:

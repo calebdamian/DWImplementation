@@ -4,21 +4,6 @@ import pandas as pd
 import configparser
 
 
-config = configparser.ConfigParser()
-config.read(".properties")
-config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
-cvsSectionName = "CSVSection"
-
 # Db stays the same
 def tran_channels():
     try:

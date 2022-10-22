@@ -8,17 +8,10 @@ from extract.extract_products import ext_products
 from extract.extract_promotions import ext_promotions
 from extract.extract_sales import ext_sales
 from extract.extract_times import ext_times
-
+from transform.transformations import *
 
 try:
-    ext_channels()
-    ext_countries()
-    ext_customers()
-    ext_products()
-    ext_promotions()
-    ext_sales()
-    ext_times()
-
+    print()
 except:
     traceback.print_exc()
 finally:

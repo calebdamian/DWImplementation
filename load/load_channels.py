@@ -1,11 +1,8 @@
 import traceback
-from transform.transformations import str_to_int, str_to_str_w_length
-from util import db_ses_db_sorection
 import pandas as pd
 import configparser
 
 from util.db_connection import Db_Connection
-
 
 config = configparser.ConfigParser()
 config.read(".properties")
@@ -29,6 +26,7 @@ stg_conn = Db_Connection(
 )
 cvsSectionName = "CSVSection"
 
+
 # Db changes to be SOR
 def load_channels(curr_cod_etl):
     try:
@@ -39,7 +37,7 @@ def load_channels(curr_cod_etl):
         if ses_db_sor == -1:
             raise Exception(f"The database type {ses_db_sor.type} is not valid")
         elif ses_db_sor == -2:
-            raise Exception("Error trying to ses_db_sorect to cdnastaging")
+            raise Exception("Error trying to ses_db_sorect to cdnasor")
 
         if ses_db_stg == -1:
             raise Exception(f"The database type {ses_db_stg.type} is not valid")
@@ -48,7 +46,7 @@ def load_channels(curr_cod_etl):
 
         # Dictionary of values
 
-        colummns_dict = {
+        chann_dict = {
             "channel_id": [],
             "channel_desc": [],
             "channel_class": [],
@@ -58,29 +56,41 @@ def load_channels(curr_cod_etl):
 
         # Read extraction table
         channel_tra = pd.read_sql(
-            f"SELECT CHANNEL_ID,CHANNEL_DESC, CHANNEL_CLASS, CHANNEL_CLASS_ID FROM channels_tra WHERE {curr_cod_etl}",
+            f"SELECT channel_id,channel_desc, channel_class, channel_class_id FROM channels_tra WHERE cod_etl = {curr_cod_etl}",
             ses_db_stg,
         )
 
         # Processing rows
         if not channel_tra.empty:
-            for ch_id, ch_desc, ch_class, ch_class_id in zip(
-                channel_tra["CHANNEL_ID"],
-                channel_tra["CHANNEL_DESC"],
-                channel_tra["CHANNEL_CLASS"],
-                channel_tra["CHANNEL_CLASS_ID"],
-            ):
-                colummns_dict["channel_id"].append(ch_id)
-                colummns_dict["channel_desc"].append(ch_desc)
-                colummns_dict["channel_class"].append(ch_class)
-                colummns_dict["channel_class_id"].append(ch_class_id)
-                colummns_dict["cod_etl"].append(curr_cod_etl)
 
-        if colummns_dict["channel_id"]:
+            dim_channel = pd.read_sql(
+                f"SELECT channel_id,channel_desc, channel_class, channel_class_id FROM dim_channels WHERE cod_etl = {curr_cod_etl}",
+                ses_db_sor,
+            )
+
+            # TODO: Merge
+
+            clean_df = dim_channel.merge(channel_tra)
+
+            print(clean_df)
+
+            for ch_id, ch_desc, ch_class, ch_class_id in zip(
+                    channel_tra["channel_id"],
+                    channel_tra["channel_desc"],
+                    channel_tra["channel_class"],
+                    channel_tra["channel_class_id"],
+            ):
+                chann_dict["channel_id"].append(ch_id)
+                chann_dict["channel_desc"].append(ch_desc)
+                chann_dict["channel_class"].append(ch_class)
+                chann_dict["channel_class_id"].append(ch_class_id)
+                chann_dict["cod_etl"].append(curr_cod_etl)
+
+        if chann_dict["channel_id"]:
             # Creating Dataframe
             # Persisting into db
             # Loading
-            df_ch_tra = pd.DataFrame(colummns_dict)
+            df_ch_tra = pd.DataFrame(chann_dict)
             df_ch_tra.to_sql(
                 "dim_channels", ses_db_sor, if_exists="append", index=False
             )

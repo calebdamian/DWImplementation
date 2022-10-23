@@ -38,3 +38,8 @@ def str_to_float(str1):
         val = None
         print("Invalid string at str_to_float")
     return val
+
+
+def get_month_name(str1):
+    val = datetime.strptime(str1, "%m")
+    return val.strftime("%B")

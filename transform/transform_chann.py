@@ -4,7 +4,6 @@ from util import db_connection
 import pandas as pd
 import configparser
 
-
 config = configparser.ConfigParser()
 config.read(".properties")
 config.get("DatabaseSection", "DB_TYPE")
@@ -19,6 +18,7 @@ stg_conn = db_connection.Db_Connection(
     config.get(sectionName, "STG_NAME"),
 )
 cvsSectionName = "CSVSection"
+
 
 # Db stays the same
 def tran_chann(curr_cod_etl):
@@ -50,10 +50,10 @@ def tran_chann(curr_cod_etl):
         # Processing rows
         if not channel_ext.empty:
             for ch_id, desc, ch_class, ch_class_id in zip(
-                channel_ext["CHANNEL_ID"],
-                channel_ext["CHANNEL_DESC"],
-                channel_ext["CHANNEL_CLASS"],
-                channel_ext["CHANNEL_CLASS_ID"],
+                    channel_ext["CHANNEL_ID"],
+                    channel_ext["CHANNEL_DESC"],
+                    channel_ext["CHANNEL_CLASS"],
+                    channel_ext["CHANNEL_CLASS_ID"],
             ):
                 colummns_dict["channel_id"].append(str_to_int(ch_id))
                 colummns_dict["channel_desc"].append(str_to_str_w_length(desc, 20))

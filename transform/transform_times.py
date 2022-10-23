@@ -1,5 +1,10 @@
 import traceback
-from transform.transformations import str_to_date, str_to_int, str_to_str_w_length
+from transform.transformations import (
+    get_month_name,
+    str_to_date,
+    str_to_int,
+    str_to_str_w_length,
+)
 from util import db_connection
 import pandas as pd
 import configparser
@@ -42,9 +47,10 @@ def tran_times(curr_cod_etl):
             "calendar_month_number": [],
             "calendar_month_desc": [],
             "end_of_cal_month": [],
+            "calendar_month_name": [],
             "calendar_quarter_desc": [],
             "calendar_year": [],
-            "cod_etl": [],
+            'cod_etl': [],
         }
 
         # Read extraction table
@@ -55,15 +61,15 @@ def tran_times(curr_cod_etl):
         # Processing rows
         if not times_ext.empty:
             for (
-                id,
-                t_day_n,
-                t_day_nbr_w,
-                t_day_nbr_m,
-                t_c_w_n,
-                t_c_m_nbr,
-                t_c_m_desc,
-                t_end,
-                t_qua_desc,
+                t_id,
+                t_day_name,
+                t_day_number_wk,
+                t_day_number_mth,
+                t_cal_wk_number,
+                t_cal_mth_number,
+                t_cal_mth_desc,
+                t_eocal_mth,
+                t_cal_qua_desc,
                 t_cal_yr,
             ) in zip(
                 times_ext["TIME_ID"],
@@ -78,21 +84,30 @@ def tran_times(curr_cod_etl):
                 times_ext["CALENDAR_YEAR"],
             ):
 
-                times_col_dict["time_id"].append(str_to_date(id))
-                times_col_dict["day_name"].append(str_to_str_w_length(t_day_n, 9))
-                times_col_dict["day_number_in_week"].append(str_to_int(t_day_nbr_w))
-                times_col_dict["day_number_in_month"].append(str_to_int(t_day_nbr_m))
-                times_col_dict["calendar_week_number"].append(str_to_int(t_c_w_n))
-                times_col_dict["calendar_month_number"].append(str_to_int(t_c_m_nbr))
-                times_col_dict["calendar_month_desc"].append(
-                    str_to_str_w_length(t_c_m_desc, 8)
+                times_col_dict["time_id"].append(str_to_date(t_id))
+                times_col_dict["day_name"].append(str_to_str_w_length(t_day_name, 9))
+                times_col_dict["day_number_in_week"].append(str_to_int(t_day_number_wk))
+                times_col_dict["day_number_in_month"].append(
+                    str_to_int(t_day_number_mth)
                 )
-                times_col_dict["end_of_cal_month"].append(str_to_date(t_end))
+                times_col_dict["calendar_week_number"].append(
+                    str_to_int(t_cal_wk_number)
+                )
+                times_col_dict["calendar_month_number"].append(
+                    str_to_int(t_cal_mth_number)
+                )
+                times_col_dict["calendar_month_desc"].append(
+                    str_to_str_w_length(t_cal_mth_desc, 8)
+                )
+                times_col_dict["end_of_cal_month"].append(str_to_date(t_eocal_mth))
+                times_col_dict["calendar_month_name"].append(
+                    get_month_name(t_cal_mth_number)
+                )
                 times_col_dict["calendar_quarter_desc"].append(
-                    str_to_str_w_length(t_qua_desc, 7)
+                    str_to_str_w_length(t_cal_qua_desc, 7)
                 )
                 times_col_dict["calendar_year"].append(str_to_int(t_cal_yr))
-                times_col_dict["cod_etl"].append(curr_cod_etl)
+                times_col_dict['cod_etl'].append(curr_cod_etl)
 
         if times_col_dict["time_id"]:
             # Creating Dataframe

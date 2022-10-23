@@ -30,7 +30,7 @@ stg_conn = Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db changes to be SOR
-def load_channels():
+def load_channels(curr_cod_etl):
     try:
 
         # Using both dbs
@@ -53,11 +53,12 @@ def load_channels():
             "channel_desc": [],
             "channel_class": [],
             "channel_class_id": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
         channel_tra = pd.read_sql(
-            "SELECT CHANNEL_ID,CHANNEL_DESC, CHANNEL_CLASS, CHANNEL_CLASS_ID FROM channels_tra",
+            f"SELECT CHANNEL_ID,CHANNEL_DESC, CHANNEL_CLASS, CHANNEL_CLASS_ID FROM channels_tra WHERE {curr_cod_etl}",
             ses_db_stg,
         )
 
@@ -73,6 +74,8 @@ def load_channels():
                 colummns_dict["channel_desc"].append(ch_desc)
                 colummns_dict["channel_class"].append(ch_class)
                 colummns_dict["channel_class_id"].append(ch_class_id)
+                colummns_dict["cod_etl"].append(curr_cod_etl)
+
         if colummns_dict["channel_id"]:
             # Creating Dataframe
             # Persisting into db

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def str_to_int(str1):
     try:
         val = int(str1)
@@ -14,16 +15,20 @@ def str_to_char(str1):
 
 
 def str_to_str_w_length(str1, length):
-    if len(str1) > length:
-        return str1[:length]
-    elif len(str1) == length or len(str1) < length:
-        return str1
-    else:
-        print("Error at str_to_str_w_length")
+    try:
+        if len(str1) > length:
+            return str1[:length]
+        elif len(str1) == length or len(str1) < length:
+            return str1
+        elif len(str1) == None:
+            return None
+    except:
+        print("String is empty")
+        return None
 
 
 def str_to_date(str1):
-    return datetime.strptime(str1, "%d-%m-%Y")
+    return datetime.strptime(str1, "%d-%b-%y")
 
 
 def str_to_float(str1):

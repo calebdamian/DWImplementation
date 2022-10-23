@@ -21,7 +21,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_times():
+def tran_times(curr_cod_etl):
     try:
 
         # Connecting db
@@ -44,6 +44,7 @@ def tran_times():
             "end_of_cal_month": [],
             "calendar_quarter_desc": [],
             "calendar_year": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
@@ -77,7 +78,7 @@ def tran_times():
                 times_ext["CALENDAR_YEAR"],
             ):
 
-                times_col_dict["time_id"].append(str_to_int(id))
+                times_col_dict["time_id"].append(str_to_date(id))
                 times_col_dict["day_name"].append(str_to_str_w_length(t_day_n, 9))
                 times_col_dict["day_number_in_week"].append(str_to_int(t_day_nbr_w))
                 times_col_dict["day_number_in_month"].append(str_to_int(t_day_nbr_m))
@@ -91,6 +92,7 @@ def tran_times():
                     str_to_str_w_length(t_qua_desc, 7)
                 )
                 times_col_dict["calendar_year"].append(str_to_int(t_cal_yr))
+                times_col_dict["cod_etl"].append(curr_cod_etl)
 
         if times_col_dict["time_id"]:
             # Creating Dataframe

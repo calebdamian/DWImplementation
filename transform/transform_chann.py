@@ -21,7 +21,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_chann():
+def tran_chann(curr_cod_etl):
     try:
 
         # Connecting db
@@ -46,30 +46,7 @@ def tran_chann():
             "SELECT CHANNEL_ID,CHANNEL_DESC, CHANNEL_CLASS, CHANNEL_CLASS_ID FROM channels_ext",
             ses_db_stg,
         )
-        """ etl_code_df = pd.read_sql(
-            "SELECT * FROM proc_etl ORDER BY cod_etl DESC LIMIT 1", ses_db_stg
-        )"""
-        """curr_etl_code = ses_db_stg.execute(
-            "SELECT * FROM proc_etl ORDER BY cod_etl DESC LIMIT 1"
-        )
-        if curr_etl_code is None:
-            # etl_code["cod_etl"].append(1)
-            # etl_code.to_sql("proc_etl", ses_db_stg, if_exists="append")
-            ses_db_stg.execute("INSERT INTO proc_etl(cod_etl) VALUES (1)")
-            curr_etl_code = ses_db_stg.execute(
-                "SELECT * FROM proc_etl ORDER BY cod_etl DESC LIMIT 1"
-            )
-        else:
-            for Data in curr_etl_code.fetchall():
-                item = Data[0]
-            val = int(item)
-            print(val + 1)
-            ses_db_stg.execute("insert into proc_etl(cod_etl) values (%d)", (int(val)))
-        # etl_code.drop(columns="cod_etl", axis=1, inplace=True)
-        # etl_code["cod_etl"].append(int_curr_etl_code)
-        # etl_code.to_sql("proc_etl", ses_db_stg, if_exists="append")
-        print(curr_etl_code)
-        """
+
         # Processing rows
         if not channel_ext.empty:
             for ch_id, desc, ch_class, ch_class_id in zip(
@@ -82,7 +59,7 @@ def tran_chann():
                 colummns_dict["channel_desc"].append(str_to_str_w_length(desc, 20))
                 colummns_dict["channel_class"].append(str_to_str_w_length(ch_class, 20))
                 colummns_dict["channel_class_id"].append(str_to_int(ch_class_id))
-                # colummns_dict["cod_etl"].append(curr_etl_code)
+                colummns_dict["cod_etl"].append(curr_cod_etl)
 
         if colummns_dict["channel_id"]:
             # Creating Dataframe

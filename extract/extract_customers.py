@@ -55,7 +55,7 @@ def ext_customers():
         # Processing CSV content
         if not customers_csv.empty:
             for (
-                id,
+                cust_id,
                 f_name,
                 last_name,
                 gender,
@@ -88,7 +88,7 @@ def ext_customers():
                 customers_csv["CUST_EMAIL"],
             ):
 
-                customers_col_dict["cust_id"].append(id)
+                customers_col_dict["cust_id"].append(cust_id)
                 customers_col_dict["cust_first_name"].append(f_name)
                 customers_col_dict["cust_last_name"].append(last_name)
                 customers_col_dict["cust_gender"].append(gender)

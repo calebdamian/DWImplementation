@@ -21,7 +21,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_customers():
+def tran_customers(curr_cod_etl):
     try:
 
         # Connecting db
@@ -49,6 +49,7 @@ def tran_customers():
             "cust_income_level": [],
             "cust_credit_limit": [],
             "cust_email": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
@@ -123,13 +124,14 @@ def tran_customers():
                 )
                 customers_col_dict["cust_credit_limit"].append(str_to_int(credit))
                 customers_col_dict["cust_email"].append(str_to_str_w_length(email, 30))
+                customers_col_dict["cod_etl"].append(curr_cod_etl)
 
         if customers_col_dict["cust_id"]:
             # Creating Dataframe
             # Persisting into db
             df_customers = pd.DataFrame(customers_col_dict)
             df_customers.to_sql(
-                "customers_ext", ses_db_stg, if_exists="append", index=False
+                "customers_tra", ses_db_stg, if_exists="append", index=False
             )
             # Dispose db connection
             ses_db_stg.dispose()

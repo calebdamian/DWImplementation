@@ -25,7 +25,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_sales():
+def tran_sales(curr_cod_etl):
     try:
 
         # Connecting db
@@ -45,6 +45,7 @@ def tran_sales():
             "promo_id": [],
             "quantity_sold": [],
             "amount_sold": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
@@ -70,6 +71,7 @@ def tran_sales():
                 sales_col_dict["promo_id"].append(str_to_int(sl_promo_id))
                 sales_col_dict["quantity_sold"].append(str_to_float(sl_q))
                 sales_col_dict["amount_sold"].append(str_to_float(sl_am))
+                sales_col_dict["cod_etl"].append(curr_cod_etl)
         if sales_col_dict["prod_id"]:
             # Creating Dataframe
             # Persisting into db

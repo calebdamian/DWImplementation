@@ -26,7 +26,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_promotions():
+def tran_promotions(curr_cod_etl):
     try:
         # Connecting db
         ses_db_stg = stg_conn.start()
@@ -43,6 +43,7 @@ def tran_promotions():
             "promo_cost": [],
             "promo_begin_date": [],
             "promo_end_date": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
@@ -64,6 +65,7 @@ def tran_promotions():
                 promos_col_dict["promo_cost"].append(str_to_float(pr_cost))
                 promos_col_dict["promo_begin_date"].append(str_to_date(pr_begin))
                 promos_col_dict["promo_end_date"].append(str_to_date(pr_end))
+                promos_col_dict["cod_etl"].append(curr_cod_etl)
 
         if promos_col_dict["promo_id"]:
             # Creating Dataframe

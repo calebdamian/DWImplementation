@@ -21,7 +21,7 @@ stg_conn = db_connection.Db_Connection(
 cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_countries():
+def tran_countries(curr_cod_etl):
     try:
 
         # Connecting db
@@ -38,6 +38,7 @@ def tran_countries():
             "country_name": [],
             "country_region": [],
             "country_region_id": [],
+            "cod_etl": [],
         }
 
         # Read extraction table
@@ -58,6 +59,7 @@ def tran_countries():
                 country_col_dict["country_name"].append(str_to_str_w_length(name, 40))
                 country_col_dict["country_region"].append(str_to_str_w_length(reg, 20))
                 country_col_dict["country_region_id"].append(str_to_int(reg_id))
+                country_col_dict["cod_etl"].append(curr_cod_etl)
         if country_col_dict["country_id"]:
             # Creating Dataframe
             # Persisting into db

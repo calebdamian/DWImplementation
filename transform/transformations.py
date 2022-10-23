@@ -1,8 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
-from pickletools import decimalnl_short
-from unicodedata import decimal
-
 
 def str_to_int(str1):
     try:
@@ -27,7 +23,7 @@ def str_to_str_w_length(str1, length):
 
 
 def str_to_date(str1):
-    return datetime.date(str1, "%d-%m-%Y")
+    return datetime.strptime(str1, "%d-%m-%Y")
 
 
 def str_to_float(str1):

@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy import insert
 
 
 class Db_Connection:
@@ -36,3 +37,6 @@ class Db_Connection:
 
     def stop(self):
         self.connection.dispose()
+
+    def insert(self, table, val_dict):
+        self.insert(table).values(val_dict)

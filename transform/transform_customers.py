@@ -1,9 +1,10 @@
-import traceback
-from transform.transformations import str_to_char, str_to_int, str_to_str_w_length
-from util import db_connection
-import pandas as pd
 import configparser
+import traceback
 
+import pandas as pd
+
+from transform.transformations import str_to_char, str_to_int, str_to_str_w_length, join_2_strings
+from util import db_connection
 
 config = configparser.ConfigParser()
 config.read(".properties")
@@ -20,6 +21,7 @@ stg_conn = db_connection.Db_Connection(
 )
 cvsSectionName = "CSVSection"
 
+
 # Db stays the same
 def tran_customers(curr_cod_etl):
     try:
@@ -35,8 +37,7 @@ def tran_customers(curr_cod_etl):
 
         customers_col_dict = {
             "cust_id": [],
-            "cust_first_name": [],
-            "cust_last_name": [],
+            "cust_name": [],
             "cust_gender": [],
             "cust_year_of_birth": [],
             "cust_marital_status": [],
@@ -60,21 +61,21 @@ def tran_customers(curr_cod_etl):
         # Processing rows
         if not customers_ext.empty:
             for (
-                id,
-                f_name,
-                last_name,
-                gender,
-                y_birth,
-                marital_status,
-                street,
-                postal,
-                city,
-                state_province,
-                country_id,
-                phone_number,
-                income,
-                credit,
-                email,
+                    id,
+                    f_name,
+                    last_name,
+                    gender,
+                    y_birth,
+                    marital_status,
+                    street,
+                    postal,
+                    city,
+                    state_province,
+                    country_id,
+                    phone_number,
+                    income,
+                    credit,
+                    email,
             ) in zip(
                 customers_ext["CUST_ID"],
                 customers_ext["CUST_FIRST_NAME"],
@@ -92,13 +93,9 @@ def tran_customers(curr_cod_etl):
                 customers_ext["CUST_CREDIT_LIMIT"],
                 customers_ext["CUST_EMAIL"],
             ):
-
                 customers_col_dict["cust_id"].append(str_to_int(id))
-                customers_col_dict["cust_first_name"].append(
-                    str_to_str_w_length(f_name, 20)
-                )
-                customers_col_dict["cust_last_name"].append(
-                    str_to_str_w_length(last_name, 40)
+                customers_col_dict["cust_name"].append(
+                    join_2_strings(f_name, last_name)
                 )
                 customers_col_dict["cust_gender"].append(str_to_char(gender))
                 customers_col_dict["cust_year_of_birth"].append(str_to_int(y_birth))

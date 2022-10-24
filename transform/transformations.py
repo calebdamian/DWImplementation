@@ -23,7 +23,7 @@ def str_to_str_w_length(str1, length):
         elif len(str1) == None:
             return None
     except:
-        print("String is empty")
+        # print("String is empty")
         return None
 
 
@@ -36,10 +36,14 @@ def str_to_float(str1):
         val = float(str1)
     except:
         val = None
-        print("Invalid string at str_to_float")
+        # print("Invalid string at str_to_float")
     return val
 
 
 def get_month_name(str1):
     val = datetime.strptime(str1, "%m")
-    return val.strftime("%B")
+    return val.strftime("%b")
+
+
+def join_2_strings(str1, str2):
+    return f"{str1} {str2}"

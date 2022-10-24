@@ -1,34 +1,15 @@
-import traceback
-from util import db_connection
-import pandas as pd
 import configparser
+import traceback
 
+import pandas as pd
 
 config = configparser.ConfigParser()
 config.read(".properties")
-config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
 cvsSectionName = "CSVSection"
 
 
-def ext_customers():
+def ext_customers(ses_db_stg):
     try:
-        # Connecting db
-        conn = stg_conn.start()
-        if conn == -1:
-            raise Exception(f"The database type {stg_conn.type} is not valid")
-        elif conn == -2:
-            raise Exception("Error trying to connect to cdnastaging")
-
         # Dictionary of values
 
         customers_col_dict = {
@@ -55,21 +36,21 @@ def ext_customers():
         # Processing CSV content
         if not customers_csv.empty:
             for (
-                cust_id,
-                f_name,
-                last_name,
-                gender,
-                y_birth,
-                marital_status,
-                street,
-                postal,
-                city,
-                state_province,
-                country_id,
-                phone_number,
-                income,
-                credit,
-                email,
+                    cust_id,
+                    f_name,
+                    last_name,
+                    gender,
+                    y_birth,
+                    marital_status,
+                    street,
+                    postal,
+                    city,
+                    state_province,
+                    country_id,
+                    phone_number,
+                    income,
+                    credit,
+                    email,
             ) in zip(
                 customers_csv["CUST_ID"],
                 customers_csv["CUST_FIRST_NAME"],
@@ -87,7 +68,6 @@ def ext_customers():
                 customers_csv["CUST_CREDIT_LIMIT"],
                 customers_csv["CUST_EMAIL"],
             ):
-
                 customers_col_dict["cust_id"].append(cust_id)
                 customers_col_dict["cust_first_name"].append(f_name)
                 customers_col_dict["cust_last_name"].append(last_name)
@@ -105,13 +85,11 @@ def ext_customers():
                 customers_col_dict["cust_email"].append(email)
 
         if customers_col_dict["cust_id"]:
-            conn.connect().execute("TRUNCATE TABLE customers_ext")
+            ses_db_stg.connect().execute("TRUNCATE TABLE customers_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(customers_col_dict)
-            df_countries.to_sql("customers_ext", conn, if_exists="append", index=False)
-            # Dispose db connection
-            conn.dispose()
+            df_countries.to_sql("customers_ext", ses_db_stg, if_exists="append", index=False)
     except:
         traceback.print_exc()
     finally:

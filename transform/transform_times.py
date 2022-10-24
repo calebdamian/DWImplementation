@@ -1,40 +1,18 @@
 import traceback
+
+import pandas as pd
+
 from transform.transformations import (
     get_month_name,
     str_to_date,
     str_to_int,
     str_to_str_w_length,
 )
-from util import db_connection
-import pandas as pd
-import configparser
 
-
-config = configparser.ConfigParser()
-config.read(".properties")
-config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
-cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_times(curr_cod_etl):
+def tran_times(curr_cod_etl, ses_db_stg):
     try:
-
-        # Connecting db
-        ses_db_stg = stg_conn.start()
-        if ses_db_stg == -1:
-            raise Exception(f"The database type {stg_conn.type} is not valid")
-        elif ses_db_stg == -2:
-            raise Exception("Error trying to connect to cdnastaging")
 
         # Dictionary of values
 
@@ -61,16 +39,16 @@ def tran_times(curr_cod_etl):
         # Processing rows
         if not times_ext.empty:
             for (
-                t_id,
-                t_day_name,
-                t_day_number_wk,
-                t_day_number_mth,
-                t_cal_wk_number,
-                t_cal_mth_number,
-                t_cal_mth_desc,
-                t_eocal_mth,
-                t_cal_qua_desc,
-                t_cal_yr,
+                    t_id,
+                    t_day_name,
+                    t_day_number_wk,
+                    t_day_number_mth,
+                    t_cal_wk_number,
+                    t_cal_mth_number,
+                    t_cal_mth_desc,
+                    t_eocal_mth,
+                    t_cal_qua_desc,
+                    t_cal_yr,
             ) in zip(
                 times_ext["TIME_ID"],
                 times_ext["DAY_NAME"],
@@ -83,7 +61,6 @@ def tran_times(curr_cod_etl):
                 times_ext["CALENDAR_QUARTER_DESC"],
                 times_ext["CALENDAR_YEAR"],
             ):
-
                 times_col_dict["time_id"].append(str_to_date(t_id))
                 times_col_dict["day_name"].append(str_to_str_w_length(t_day_name, 9))
                 times_col_dict["day_number_in_week"].append(str_to_int(t_day_number_wk))
@@ -114,8 +91,7 @@ def tran_times(curr_cod_etl):
             # Persisting into db
             df_times = pd.DataFrame(times_col_dict)
             df_times.to_sql("times_tra", ses_db_stg, if_exists="append", index=False)
-            # Dispose db connection
-            ses_db_stg.dispose()
+
     except:
         traceback.print_exc()
     finally:

@@ -1,33 +1,16 @@
-import traceback
-from util import db_connection
-import pandas as pd
 import configparser
+import traceback
 
+import pandas as pd
 
 config = configparser.ConfigParser()
 config.read(".properties")
 config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
 cvsSectionName = "CSVSection"
 
 
-def ext_promotions():
+def ext_promotions(ses_db_stg):
     try:
-        # Connecting db
-        conn = stg_conn.start()
-        if conn == -1:
-            raise Exception(f"The database type {stg_conn.type} is not valid")
-        elif conn == -2:
-            raise Exception("Error trying to connect to cdnastaging")
 
         # Dictionary of values
 
@@ -45,13 +28,12 @@ def ext_promotions():
         # Processing CSV content
         if not promos_csv.empty:
             for (id, pr_name, pr_cost, pr_begin, pr_end) in zip(
-                promos_csv["PROMO_ID"],
-                promos_csv["PROMO_NAME"],
-                promos_csv["PROMO_COST"],
-                promos_csv["PROMO_BEGIN_DATE"],
-                promos_csv["PROMO_END_DATE"],
+                    promos_csv["PROMO_ID"],
+                    promos_csv["PROMO_NAME"],
+                    promos_csv["PROMO_COST"],
+                    promos_csv["PROMO_BEGIN_DATE"],
+                    promos_csv["PROMO_END_DATE"],
             ):
-
                 promos_col_dict["promo_id"].append(id)
                 promos_col_dict["promo_name"].append(pr_name)
                 promos_col_dict["promo_cost"].append(pr_cost)
@@ -59,13 +41,11 @@ def ext_promotions():
                 promos_col_dict["promo_end_date"].append(pr_end)
 
         if promos_col_dict["promo_id"]:
-            conn.connect().execute("TRUNCATE TABLE promotions_ext")
+            ses_db_stg.connect().execute("TRUNCATE TABLE promotions_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(promos_col_dict)
-            df_countries.to_sql("promotions_ext", conn, if_exists="append", index=False)
-            # Dispose db connection
-            conn.dispose()
+            df_countries.to_sql("promotions_ext", ses_db_stg, if_exists="append", index=False)
     except:
         traceback.print_exc()
     finally:

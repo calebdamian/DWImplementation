@@ -1,40 +1,17 @@
 import traceback
+
+import pandas as pd
+
 from transform.transformations import (
     str_to_date,
     str_to_float,
     str_to_int,
 )
-from util import db_connection
-import pandas as pd
-import configparser
 
-
-config = configparser.ConfigParser()
-config.read(".properties")
-config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
-cvsSectionName = "CSVSection"
 
 # Db stays the same
-def tran_sales(curr_cod_etl):
+def tran_sales(curr_cod_etl, ses_db_stg):
     try:
-
-        # Connecting db
-        ses_db_stg = stg_conn.start()
-        if ses_db_stg == -1:
-            raise Exception(f"The database type {stg_conn.type} is not valid")
-        elif ses_db_stg == -2:
-            raise Exception("Error trying to connect to cdnastaging")
-
         # Dictionary of values
 
         sales_col_dict = {
@@ -56,13 +33,13 @@ def tran_sales(curr_cod_etl):
         # Processing rows
         if not sales_ext.empty:
             for id, sl_cus_id, sl_ti_id, sl_ch_id, sl_promo_id, sl_q, sl_am, in zip(
-                sales_ext["PROD_ID"],
-                sales_ext["CUST_ID"],
-                sales_ext["TIME_ID"],
-                sales_ext["CHANNEL_ID"],
-                sales_ext["PROMO_ID"],
-                sales_ext["QUANTITY_SOLD"],
-                sales_ext["AMOUNT_SOLD"],
+                    sales_ext["PROD_ID"],
+                    sales_ext["CUST_ID"],
+                    sales_ext["TIME_ID"],
+                    sales_ext["CHANNEL_ID"],
+                    sales_ext["PROMO_ID"],
+                    sales_ext["QUANTITY_SOLD"],
+                    sales_ext["AMOUNT_SOLD"],
             ):
                 sales_col_dict["prod_id"].append(str_to_int(id))
                 sales_col_dict["cust_id"].append(str_to_int(sl_cus_id))
@@ -80,9 +57,6 @@ def tran_sales(curr_cod_etl):
             df_sales_tra.to_sql(
                 "sales_tra", ses_db_stg, if_exists="append", index=False
             )
-
-            # Dispose db connection
-            ses_db_stg.dispose()
     except:
         traceback.print_exc()
     finally:

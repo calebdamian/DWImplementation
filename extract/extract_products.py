@@ -1,33 +1,16 @@
-import traceback
-from util import db_connection
-import pandas as pd
 import configparser
+import traceback
 
+import pandas as pd
 
 config = configparser.ConfigParser()
 config.read(".properties")
 config.get("DatabaseSection", "DB_TYPE")
-# Creating a new db conn object
-sectionName = "DatabaseSection"
-stg_conn = db_connection.Db_Connection(
-    config.get(sectionName, "DB_TYPE"),
-    config.get(sectionName, "DB_HOST"),
-    config.get(sectionName, "DB_PORT"),
-    config.get(sectionName, "DB_USER"),
-    config.get(sectionName, "DB_PWD"),
-    config.get(sectionName, "STG_NAME"),
-)
 cvsSectionName = "CSVSection"
 
 
-def ext_products():
+def ext_products(ses_db_stg):
     try:
-        # Connecting db
-        conn = stg_conn.start()
-        if conn == -1:
-            raise Exception(f"The database type {stg_conn.type} is not valid")
-        elif conn == -2:
-            raise Exception("Error trying to connect to cdnastaging")
 
         # Dictionary of values
 
@@ -51,17 +34,17 @@ def ext_products():
         # Processing CSV content
         if not products_csv.empty:
             for (
-                id,
-                p_name,
-                p_desc,
-                p_cat,
-                p_cat_id,
-                p_cat_desc,
-                p_w_class,
-                supp_id,
-                p_status,
-                p_list,
-                p_min,
+                    id,
+                    p_name,
+                    p_desc,
+                    p_cat,
+                    p_cat_id,
+                    p_cat_desc,
+                    p_w_class,
+                    supp_id,
+                    p_status,
+                    p_list,
+                    p_min,
             ) in zip(
                 products_csv["PROD_ID"],
                 products_csv["PROD_NAME"],
@@ -75,7 +58,6 @@ def ext_products():
                 products_csv["PROD_LIST_PRICE"],
                 products_csv["PROD_MIN_PRICE"],
             ):
-
                 products_col_dict["prod_id"].append(id)
                 products_col_dict["prod_name"].append(p_name)
                 products_col_dict["prod_desc"].append(p_desc)
@@ -89,13 +71,11 @@ def ext_products():
                 products_col_dict["prod_min_price"].append(p_min)
 
         if products_col_dict["prod_id"]:
-            conn.connect().execute("TRUNCATE TABLE products_ext")
+            ses_db_stg.connect().execute("TRUNCATE TABLE products_ext")
             # Creating Dataframe
             # Persisting into db
             df_countries = pd.DataFrame(products_col_dict)
-            df_countries.to_sql("products_ext", conn, if_exists="append", index=False)
-            # Dispose db connection
-            conn.dispose()
+            df_countries.to_sql("products_ext", ses_db_stg, if_exists="append", index=False)
     except:
         traceback.print_exc()
     finally:

@@ -7,11 +7,18 @@ from extract.extract_sales import ext_sales
 from extract.extract_times import ext_times
 
 
-def ext_all_tables():
-    ext_channels()
-    ext_countries()
-    ext_customers()
-    ext_products()
-    ext_promotions()
-    ext_sales()
-    ext_times()
+def extract_all_tables(ses_db_stg):
+    print("Extracting channels...")
+    ext_channels(ses_db_stg)
+    print("Extracting countries...")
+    ext_countries(ses_db_stg)
+    print("Extracting customers...")
+    ext_customers(ses_db_stg)
+    print("Extracting products...")
+    ext_products(ses_db_stg)
+    print("Extracting promotions...")
+    ext_promotions(ses_db_stg)
+    print("Extracting sales...")
+    ext_sales(ses_db_stg)
+    print("Extracting times...")
+    ext_times(ses_db_stg)

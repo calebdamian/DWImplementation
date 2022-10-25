@@ -7,7 +7,6 @@ import pandas as pd
 def load_channels(curr_cod_etl, ses_db_stg, ses_db_sor):
     try:
         # Dictionary of values
-
         chann_dict = {
             "channel_id": [],
             "channel_desc": [],

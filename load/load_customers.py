@@ -2,13 +2,11 @@ import traceback
 
 import pandas as pd
 
+from util.merge_dfs_tables import merge_dfs_tables
 
-# Db stays the same
+
 def load_customers(curr_cod_etl, ses_db_stg, ses_db_sor):
     try:
-
-        # Dictionary of values
-
         customers_col_dict = {
             "cust_id": [],
             "cust_name": [],
@@ -27,11 +25,18 @@ def load_customers(curr_cod_etl, ses_db_stg, ses_db_sor):
             "cod_etl": [],
         }
 
-        # Read extraction table
+        # Read transformation Customers table
         customers_tra = pd.read_sql(
-            "SELECT cust_id,cust_name,cust_gender,cust_year_of_birth,cust_marital_status,cust_street_address,cust_postal_code,cust_city,cust_state_province,country_id,cust_main_phone_number,cust_income_level,cust_credit_limit,cust_email FROM customers_tra",
+            f"SELECT cust_id,cust_name,cust_gender,cust_year_of_birth,cust_marital_status,cust_street_address,cust_postal_code,cust_city,cust_state_province,country_id,cust_main_phone_number,cust_income_level,cust_credit_limit,cust_email FROM customers_tra WHERE cod_etl = {curr_cod_etl}",
             ses_db_stg,
         )
+
+        # Getting surrogate and business key from countries dimension
+        customers_countries_surr_key = \
+            pd.read_sql_query("SELECT surr_id, country_id from dim_countries", ses_db_sor).set_index(
+                "country_id").to_dict()["surr_id"]
+
+        customers_tra["country_id"] = customers_tra["country_id"].apply(lambda key: customers_countries_surr_key[key])
         # Processing rows
         if not customers_tra.empty:
             for (
@@ -80,6 +85,68 @@ def load_customers(curr_cod_etl, ses_db_stg, ses_db_sor):
                 customers_col_dict["cust_city"].append(city)
                 customers_col_dict["cust_state_province"].append(state_province
                                                                  )
+                # Sending Country table business key to customers transformation table
+                customers_col_dict["country_id"].append(country_id)
+                customers_col_dict["cust_main_phone_number"].append(phone_number
+                                                                    )
+                customers_col_dict["cust_income_level"].append(income
+                                                               )
+                customers_col_dict["cust_credit_limit"].append(credit)
+                customers_col_dict["cust_email"].append(email)
+                customers_col_dict["cod_etl"].append(curr_cod_etl)
+
+        dim_customers = pd.read_sql(
+            f"SELECT cust_id,cust_name,cust_gender,cust_year_of_birth,cust_marital_status,cust_street_address,cust_postal_code,cust_city,cust_state_province,country_id,cust_main_phone_number,cust_income_level,cust_credit_limit,cust_email FROM dim_customers WHERE cod_etl = {curr_cod_etl}",
+            ses_db_sor)
+
+        if not dim_customers.empty:
+            for (
+                    cus_id,
+                    name,
+                    gender,
+                    y_birth,
+                    marital_status,
+                    street,
+                    postal,
+                    city,
+                    state_province,
+                    country_id,
+                    phone_number,
+                    income,
+                    credit,
+                    email,
+            ) in zip(
+                customers_tra["cust_id"],
+                customers_tra["cust_name"],
+                customers_tra["cust_gender"],
+                customers_tra["cust_year_of_birth"],
+                customers_tra["cust_marital_status"],
+                customers_tra["cust_street_address"],
+                customers_tra["cust_postal_code"],
+                customers_tra["cust_city"],
+                customers_tra["cust_state_province"],
+                customers_tra["country_id"],
+                customers_tra["cust_main_phone_number"],
+                customers_tra["cust_income_level"],
+                customers_tra["cust_credit_limit"],
+                customers_tra["cust_email"],
+            ):
+                customers_col_dict["cust_id"].append(cus_id)
+                customers_col_dict["cust_name"].append(
+                    name
+                )
+                customers_col_dict["cust_gender"].append(gender)
+                customers_col_dict["cust_year_of_birth"].append(y_birth)
+                customers_col_dict["cust_marital_status"].append(marital_status
+                                                                 )
+                customers_col_dict["cust_street_address"].append(street
+                                                                 )
+                customers_col_dict["cust_postal_code"].append(postal
+                                                              )
+                customers_col_dict["cust_city"].append(city)
+                customers_col_dict["cust_state_province"].append(state_province
+                                                                 )
+                # Sending country_id to customers transformation table
                 customers_col_dict["country_id"].append(country_id)
                 customers_col_dict["cust_main_phone_number"].append(phone_number
                                                                     )
@@ -91,12 +158,12 @@ def load_customers(curr_cod_etl, ses_db_stg, ses_db_sor):
 
         if customers_col_dict["cust_id"]:
             # Creating Dataframe
+            df_dim_cust = pd.DataFrame(customers_col_dict)
+            merge_dfs_tables(table_name="dim_customers", business_key_col=["cust_id"], dataframe=df_dim_cust,
+                             db_context=ses_db_sor)
             # Persisting into db
-            df_customers = pd.DataFrame(customers_col_dict)
-            df_customers.to_sql(
-                "dim_customers", ses_db_sor, if_exists="append", index=False
-            )
-    except:
+
+    except Exception:
         traceback.print_exc()
     finally:
         pass

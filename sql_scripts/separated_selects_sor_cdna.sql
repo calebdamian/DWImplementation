@@ -1,0 +1,8 @@
+USE cdnasor;
+SELECT COUNT(*) as CHANN_DIM_COUNT FROM dim_channels  ;
+SELECT COUNT(*)  as COUN_DIM_COUNT FROM dim_countries ;
+SELECT COUNT(*) as CUS_DIM_COUNT FROM dim_customers ;
+SELECT COUNT(*) AS PROD_DIM_COUNT FROM dim_products  ;
+SELECT COUNT(*)  AS PROM_DIM_COUNT FROM dim_promotions ;
+SELECT COUNT(*) AS TIMES_DIM_COUNT FROM dim_times ;
+SELECT COUNT(*) AS SALES_DIM_COUNT FROM dim_sales ;

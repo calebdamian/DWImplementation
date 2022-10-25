@@ -18,7 +18,8 @@ def extract_all_tables(ses_db_stg):
     ext_products(ses_db_stg)
     print("Extracting promotions...")
     ext_promotions(ses_db_stg)
-    print("Extracting sales...")
-    ext_sales(ses_db_stg)
     print("Extracting times...")
     ext_times(ses_db_stg)
+    print("Extracting sales...")
+    ext_sales(ses_db_stg)
+

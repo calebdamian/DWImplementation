@@ -1,4 +1,5 @@
 # Testing file
+import datetime
 import time
 import traceback
 
@@ -14,7 +15,7 @@ try:
     ses_db_sor = sess["ses_db_sor"]
     if ses_db_stg is not None and ses_db_sor is not None:
         curr_etl_code = get_curr_etl_code(ses_db_stg=ses_db_stg)
-        tinit = time.perf_counter()
+        print(f"Current ETL process: {curr_etl_code}, execution moment: {datetime.datetime.now()}")
         t0 = time.perf_counter()
         extract_all_tables(ses_db_stg=ses_db_stg)
         t1 = time.perf_counter()
@@ -29,7 +30,6 @@ try:
         print(f"Loading took: {t1 - t0} sec")
         ses_db_stg.dispose()
         ses_db_sor.dispose()
-        print(f"Etl process took: {t1 - tinit}")
 except KeyError:
     traceback.print_exc()
 finally:
